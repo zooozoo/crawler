@@ -40,6 +40,7 @@ def get_webtoon_episode_list(webtoon, page=1):
         title = td_title.get_text(strip=True)
         rating = td_rating.strong.get_text(strip=True)
         created_date = td_created_date.get_text(strip=True)
+        # webtoon_name = soup.select_one('div.comicinfo').div.a.img['alt']
 
         episode = Episode(
             webtoon=webtoon,
@@ -47,7 +48,8 @@ def get_webtoon_episode_list(webtoon, page=1):
             url_thumbnail=url_thumbnail,
             title=title,
             rating=rating,
-            created_date=created_date
+            created_date=created_date,
+            # webtoon_name=webtoon_name
         )
         episode_list.append(episode)
 

@@ -14,10 +14,13 @@ class Episode:
         self._title = title
         self._rating = rating
         self._created_date = created_date
+        # self._webtoon_name = webtoon_name
 
-        self.thumbnail_dir = f'webtoon/{self.webtoon.title_id}_thumbnail'
-        self.image_dir = f'webtoon/{self.webtoon.title_id}_images/{self.no}'
+        self.thumbnail_dir = f'webtoon/{self.webtoon.title}/{self.webtoon.title_id}_thumbnail'
+        # self.image_dir = f'webtoon/{self.webtoon.title}/{self.webtoon.title_id}__images / {self.no}'
         self.save_thumbnail()
+
+    # {self.webtoon.title}_images / {self.no}
 
     @property
     def webtoon(self):
@@ -58,7 +61,12 @@ class Episode:
                     f.write(response.content)
 
     def _save_images(self):
-        os.makedirs(self.image_dir, exist_ok=True)
+        # path = self.image_dir
+        # check_file_exists = os.path.exists(path)
+        # if not check_file_exists:
+        #     os.makedirs(path, exist_ok=True)
+
+        os.makedirs(f'webtoon/{self.webtoon.title}/{self.webtoon.title_id}__images / {self.no}_{self.title}', exist_ok=True)
         params = {
             'titleId': self.webtoon.title_id,
             'no': self.no
@@ -74,8 +82,11 @@ class Episode:
                 'Referer': url_contents
             }
             response = requests.get(url, headers=headers)
-            with open(f'{self.image_dir}/{index +1}.jpg', 'wb') as f:
+            with open(f'webtoon/{self.webtoon.title}/{self.webtoon.title_id}__images / {self.no}_{self.title}/{index +1}.jpg', 'wb') as f:
                 f.write(response.content)
+
+
+
 
 if __name__ == '__main__':
     el = pickle.load(open('db/700843.txt', 'rb'))

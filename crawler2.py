@@ -165,7 +165,9 @@ class NaverWebtoonCrawler:
             f.write(list_html_tail)
         return filename
 
-
+# el = pickle.load(open('db/700843.txt', 'rb'))
+# e = el[0]
+# e._save_images()
 
 
 # if __name__ == '__main__':
