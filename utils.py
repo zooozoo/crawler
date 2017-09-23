@@ -2,14 +2,16 @@ from urllib.parse import urlparse, parse_qs
 import requests
 from collections import namedtuple
 from bs4 import BeautifulSoup
+from episode import Episode
 
-Episode = namedtuple('Episode', ['no','img_url', 'title', 'rating', 'created_date'])
+Webtoon = namedtuple('Webtoon', ['title_id', 'img_url', 'title'])
+webtoon_yumi = 651673
+webtoon_p = 696617
 
-
-def get_webtoon_episode_list(webtoon_id, page=1):
+def get_webtoon_episode_list(webtoon, page=1):
     webtoon_list_url = 'http://comic.naver.com/webtoon/list.nhn'
     params = {
-        'titleId': webtoon_id,
+        'titleId': webtoon.title_id,
         'page': page,
     }
     response = requests.get(webtoon_list_url, params=params)
@@ -32,21 +34,21 @@ def get_webtoon_episode_list(webtoon_id, page=1):
         pqueryset = parse_qs(parse_result.query)
         no = pqueryset['no'][0]
         # 나머지 쿼리값들 중에서(키:벨류 타입으로 되어있다)
-        # no 키에 0번째 항목(넘버번호) {no:1923}
+        # no 키에 해당하는 그룹으로 된 벨류의0 번째 항목(넘버번호) {no:1923}
 
-        img_url = td_thumbnail.a.img.get('src')
+        url_thumbnail = td_thumbnail.a.img.get('src')
         title = td_title.get_text(strip=True)
         rating = td_rating.strong.get_text(strip=True)
         created_date = td_created_date.get_text(strip=True)
 
         episode = Episode(
+            webtoon=webtoon,
             no=no,
-            img_url=img_url,
+            url_thumbnail=url_thumbnail,
             title=title,
             rating=rating,
-            created_date=created_date,
+            created_date=created_date
         )
         episode_list.append(episode)
 
     return episode_list
-
