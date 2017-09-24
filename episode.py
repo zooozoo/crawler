@@ -89,6 +89,6 @@ class Episode:
 
 
 if __name__ == '__main__':
-    el = pickle.load(open('db/700843.txt', 'rb'))
-    e = el[0]
-    e._save_images()
+    # el = pickle.load(open('db/700843.txt', 'rb'))
+    # e = el[0]
+    e._save_all_episode_image()

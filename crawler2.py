@@ -7,6 +7,7 @@ import requests
 from bs4 import BeautifulSoup
 
 import utils
+import episode
 
 # NaverWebtoonCrawler클래스는 리스트를 가져오는 역할을 하는 클래스
 class NaverWebtoonCrawler:
@@ -37,7 +38,20 @@ class NaverWebtoonCrawler:
         self.load(init=True)
         print('-현재 웹툰: %s' % self.webtoon.title)
         print('-로드된 Episode수: %s' % len(self.episode_list))
+        print('-최신 에피소드: %s' % self.print_recent_episode_num())
 
+        choice = input(f"\n선택한 웹툰'{self.webtoon.title}'을 다운 받으시겠습니까? \n\n ---- 해당되는 번호를 입력해주세요 ---- \n\n1.전체다운\n2.최신화 다운\n3.취소\n 입력 : ")
+        if int(choice) == 1:
+            print('전체다운 선택 선택')
+            self.update_episode_list()
+            self.save_all_episode_image()
+        elif int(choice) == 2:
+            print('최신화 다운 선택')
+            self.save_recent_episode_image()
+            pass
+        else :
+            print('취소')
+            pass
     # self.webtoon에 해당하는 실제 웹툰의 총 episode
     @property
     def total_episode_count(self):
@@ -121,12 +135,19 @@ class NaverWebtoonCrawler:
 
         self.episode_list = new_list + self.episode_list
         self.save()
-        return len(new_list)
+        return new_list
 
     def get_last_page_episode_list(self):
         el = utils.get_webtoon_episode_list(self.webtoon, 99999)
         self.episode_list = el
         return len(self.episode_list)
+
+    def print_recent_episode_num(self):
+        el = utils.get_webtoon_episode_list(self.webtoon, 1)
+        e = el[0]
+        return(e.no)
+        # print(f'{el[0].no}화 - {el[0].title}')
+
 
     def save(self, path=None):
         # 현재폴더를 기준으로 db/<webtoon_id>.txt 파일에
@@ -164,6 +185,20 @@ class NaverWebtoonCrawler:
             list_html_tail = open('html/list_html_tail.html', 'rt').read()
             f.write(list_html_tail)
         return filename
+
+    def save_all_episode_image(self):
+        el = pickle.load(open(f'db/{self.webtoon.title_id}.txt', 'rb'))
+        for episode_num in range(len(el)):
+            e = el[episode_num]
+            e._save_images()
+            print(f'{e.no}화 저장 완료')
+
+    def save_recent_episode_image(self):
+        el = self.update_episode_list()
+        for episode_num in range(len(el)):
+            e = el[episode_num]
+            e._save_images()
+            print(f'{e.no}화 저장 완료')
 
 # el = pickle.load(open('db/700843.txt', 'rb'))
 # e = el[0]
