@@ -170,13 +170,14 @@ class NaverWebtoonCrawler:
     def make_list_html(self):
         if not os.path.isdir("webtoon"):
             os.mkdir('webtoon')
-        filename = f'webtoon/{self.webtoon.title_id}.html'
+        filename = f'webtoon/{self.webtoon.title}/{self.webtoon.title_id}.html'
         with open(filename, 'wt') as f:
             list_html_head = open('html/list_html_head.html', 'rt').read()
             f.write(list_html_head)
             for e in self.episode_list:
                 list_html_tr = open('html/list_html_tr.html','rt').read()
                 f.write(list_html_tr.format(
+                    episode_link=f'./{self.webtoon.title_id}_html/{e.title}.html',
                     img_url=f'./{self.webtoon.title_id}_thumbnail/{e.no}.jpg',
                     title=e.title,
                     rating=e.rating,
@@ -186,10 +187,34 @@ class NaverWebtoonCrawler:
             f.write(list_html_tail)
         return filename
 
+    def make_episode_html(self):
+        if not os.path.isdir("webtoon"):
+            os.mkdir('webtoon')
+        el = pickle.load(open(f'db/{self.webtoon.title_id}.txt', 'rb'))
+        for num in range(len(el)):
+            e = el[num]
+            path = f'webtoon/{e.webtoon.title}/{e.webtoon.title_id}_images/{e.no}_{e.title}'
+            file_path = f'webtoon/{self.webtoon.title}/{self.webtoon.title_id}_html/'
+            img_path = f'../{self.webtoon.title_id}_images/{e.no}_{e.title}'
+            if not os.path.isdir(file_path):
+                os.mkdir(file_path)
+            img_file_number = os.listdir(path)
+            with open(f'webtoon/{self.webtoon.title}/{self.webtoon.title_id}_html/{e.title}.html', 'wt') as f:
+                episode_head = open('html/episode_head.html', 'rt').read()
+                f.write(episode_head)
+                for e_img in range(len(img_file_number)):
+                    episode_img = open('html/episode_img.html', 'rt').read()
+                    f.write(episode_img.format(
+                        each_image=f'<img src="{img_path}/{e_img+1}.jpg">'
+                    ))
+                episode_tail = open('html/episode_tail.html', 'rt').read()
+                f.write(episode_tail)
+
+
     def save_all_episode_image(self):
         el = pickle.load(open(f'db/{self.webtoon.title_id}.txt', 'rb'))
-        for episode_num in range(len(el)):
-            e = el[episode_num]
+        for num in range(len(el)):
+            e = el[num]
             e._save_images()
             print(f'{e.no}화 저장 완료')
 
